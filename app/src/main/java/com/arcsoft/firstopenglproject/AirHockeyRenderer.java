@@ -3,6 +3,7 @@ package com.arcsoft.firstopenglproject;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 
+import com.arcsoft.firstopenglproject.util.MatrixHelper;
 import com.arcsoft.firstopenglproject.util.Shaderhelper;
 import com.arcsoft.firstopenglproject.util.TextResourceReader;
 
@@ -57,6 +58,7 @@ public class AirHockeyRenderer implements GLSurfaceView.Renderer {
     private static final String U_MATRIX = "u_Matrix";
 
     private final float[] projectionMatrix = new float[16];
+    private final float[] modelMatrix=new float[16];
 
     private static int uMatrixLocation;
 
@@ -134,7 +136,7 @@ public class AirHockeyRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         glViewport(0, 0, width, height);
 
-        final float aspectRatio = width > height ?
+        /*final float aspectRatio = width > height ?
                 (float) width / (float) height :
                 (float) height / (float) width;
 
@@ -142,7 +144,21 @@ public class AirHockeyRenderer implements GLSurfaceView.Renderer {
             Matrix.orthoM(projectionMatrix,0,-aspectRatio,aspectRatio,-1f,1f,-1f,1f);
         }else{
             Matrix.orthoM(projectionMatrix,0,-1f,1f,-aspectRatio,aspectRatio,-1f,1f);
-        }
+        }*/
+
+        MatrixHelper.perspectiveM(projectionMatrix,45f,(float)width/(float)height,1,10);
+
+        Matrix.setIdentityM(modelMatrix,0);
+        Matrix.translateM(modelMatrix,0,0f,0f,-2f);
+
+        final float[] temp=new float[16];
+
+        Matrix.multiplyMM(temp,0,projectionMatrix,0,modelMatrix,0);
+
+        Matrix.translateM(temp,0,0,0,-2.5f);
+        Matrix.rotateM(temp,0,-60f,1f,0,0);
+
+        System.arraycopy(temp,0,projectionMatrix,0,projectionMatrix.length);
     }
 
     @Override
